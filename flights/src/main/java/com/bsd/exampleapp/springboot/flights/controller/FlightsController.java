@@ -11,9 +11,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@RequestMapping(path="/flight")
 public class FlightsController {
 	
-	String[] defaultValues = {"flight-1", "flight-2", "flight-3"};
+	String[] defaultValues = {"gołąb 1", "gołąb 2", "gołąb 3"};
 	List<String> flights = new ArrayList<String>(Arrays.asList(defaultValues));
 	
 	@RequestMapping(path="/add")
