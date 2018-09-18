@@ -19,7 +19,7 @@ $( document ).ready(function() {
 		$('#pigeonsTable tbody').empty();
 		$.each(data, function(i, pigeon){
 			no = i+1;
-			var row = '<tr>' + '<td>' + no + '</td>' + '<td>' + pigeon + '</td>' + '</tr>';
+			var row = buildRow(no, pigeon);
 			$('#pigeonsTable tbody').append(row);
         });
 	}
