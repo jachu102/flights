@@ -16,7 +16,7 @@ $( document ).ready(function() {
     			name : $("#name").val(),
     	}  
 		no++;
-		var row = '<tr>' + '<td>' + no + '</td>' + '<td>' + formPigeon.name + '</td>' + '</tr>';
+		var row = buildRow(no, formPigeon.name);
 		$('#pigeonsTable tbody').append(row);
 		
 		 $.ajax({
