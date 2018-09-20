@@ -16,18 +16,17 @@ $( document ).ready(function() {
 		var formPigeon = {
     			name : $("#name").val()
     	}  
-		no++;
-		var row = buildRow(no, formPigeon.name);
-		$('#pigeonsTable tbody').append(row);
 		
 		 $.ajax({
 		        type : "POST",
 				contentType : "application/json",
-				accept: 'text/plain',
 				url : window.location + "/flight/add" + "?name=" + formPigeon.name,
-				dataType: 'text',
-		        
+				dataType: 'json',
+				data : JSON.stringify( formPigeon ),
 		        success: function(result){
+		        	no++;
+		        	var row = buildRow(no, formPigeon.name);
+		        	$('#pigeonsTable tbody').append(row);
 		        	resetData();
 		        	$("#modalAdd").modal('hide');
 		        },

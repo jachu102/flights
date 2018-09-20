@@ -8,10 +8,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bsd.exampleapp.springboot.flights.dto.PigeonDto;
@@ -24,11 +24,16 @@ public class FlightsController {
 	String[] defaultValues = {"gołąb 1", "gołąb 2", "gołąb 3"};
 	List<String> flights = new ArrayList<String>(Arrays.asList(defaultValues));
 	
-	@RequestMapping(path="/add")
-	public String add(@RequestParam(value="name") String name) {
-		flights.add(name);
+	@PostMapping(path="/add")
+	public HttpStatus add(@RequestBody PigeonDto newData) {
+		try {
+			flights.add(newData.getName());
+		} catch(Exception e)
+		{
+			return HttpStatus.BAD_REQUEST;
+		}
 		
-		return "A new flight has been just added.";
+		return HttpStatus.CREATED;
 	}
 
 	@GetMapping(path="/getAll")
