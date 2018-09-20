@@ -3,7 +3,7 @@
  */
 $( document ).ready(function() {
 	
-	$(document).on("click","a",function(event) {
+	$(document).on("click","remove",function(event) {
 		event.preventDefault();
 		var pigeonId = $(this).parent().find('input').val();
 		var rowToRemove = $(this).closest("tr");

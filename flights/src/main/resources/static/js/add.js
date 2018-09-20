@@ -6,14 +6,15 @@ $( document ).ready(function() {
 	$("#btnAdd").click(function(event){
         event.preventDefault();
         $("#modalAdd").modal();
-        
 	})
 	
 	$("#pigeonForm").submit(function(event) {
+		if( ! isAddForm($("#no")) ) 
+			return;
 		event.preventDefault();
 		
 		var formPigeon = {
-    			name : $("#name").val(),
+    			name : $("#name").val()
     	}  
 		no++;
 		var row = buildRow(no, formPigeon.name);
@@ -34,11 +35,7 @@ $( document ).ready(function() {
 		        	$("#getResultDiv").html("<strong>Error</strong>");
 					console.log("ERROR: ", e);
 		        }
-		    }); 
+		 }); 
 	});
-	
-	function resetData(){
-    	$("#name").val("");
-    }
 	
 })
