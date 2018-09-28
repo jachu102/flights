@@ -7,26 +7,29 @@ $( document ).ready(function() {
 		var pigeonId = $(this).parent().find('input').val();
 		var rowToUpdate = $(this).closest("tr");
 		var cellToUpdate = rowToUpdate.find("td:eq(1)").text();
+		var no = rowToUpdate.find("td:eq(0)").text();
 		
 		event.preventDefault();
 		$("#modalAdd").modal();
 		$("#name").val( cellToUpdate );
-		$("#no").val( pigeonId );
+		$("#id").val( pigeonId );
+		$("#no").val( no );
 	});
 	
 	$("#pigeonForm").submit(function(event) {
-		if( isAddForm($("#no")) ) 
+		if( isAddForm($("#id")) ) 
 			return;
 		event.preventDefault();
 		var formPigeon = {
     			name : $("#name").val(),
-    			no : $("#no").val()
+    			id : $("#id").val(),
+    			no : ( $("#no").val()-1 )
     	}
     	
     	$.ajax({
 	        type : "PUT",
 			contentType : "application/json",
-			url : window.location + "/flight/update/" + formPigeon.no,
+			url : window.location + "/flight/update/" + formPigeon.id,
 			dataType: 'json',
 			data : JSON.stringify( formPigeon ),
 	        success: function(result){

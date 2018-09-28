@@ -9,7 +9,7 @@ $( document ).ready(function() {
 	})
 	
 	$("#pigeonForm").submit(function(event) {
-		if( ! isAddForm($("#no")) ) 
+		if( ! isAddForm($("#id")) ) 
 			return;
 		event.preventDefault();
 		
@@ -20,12 +20,12 @@ $( document ).ready(function() {
 		 $.ajax({
 		        type : "POST",
 				contentType : "application/json",
-				url : window.location + "/flight/add" + "?name=" + formPigeon.name,
+				url : window.location + "/flight/add",
 				dataType: 'json',
 				data : JSON.stringify( formPigeon ),
 		        success: function(result){
 		        	no++;
-		        	var row = buildRow(no, formPigeon.name);
+		        	var row = buildRow(no, result);
 		        	$('#pigeonsTable tbody').append(row);
 		        	resetData();
 		        	$("#modalAdd").modal('hide');
