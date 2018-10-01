@@ -21,6 +21,16 @@ public class ArrivalsServiceImpl implements ArrivalsService {
 	public Pigeon add(Pigeon arrivedPigeon) {
 		return arrivedPigeons.save(arrivedPigeon);
 	}
+	
+	@Override
+	public void update(Pigeon arrivedPigeon) throws Exception {
+		if( arrivedPigeons.existsById(arrivedPigeon.getId()) ) {
+			arrivedPigeons.save(arrivedPigeon);
+			
+			return;
+		}
+		throw new Exception("Requested id not found.");
+	}
 
 	@Override
 	public void remove(Long pigeonId) {
