@@ -32,7 +32,7 @@ $( document ).ready(function() {
 			url : window.location + "/flight/update/" + formPigeon.id,
 			dataType: 'json',
 			data : JSON.stringify( formPigeon ),
-	        success: function(result){
+	        success: function(){
 	        	resetData();
 	        	$("#modalAdd").modal('hide');
 	        	$('#pigeonsTable tbody').find("tr:eq("+ formPigeon.no +")").find("td:eq(1)").html(formPigeon.name);

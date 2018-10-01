@@ -1,10 +1,14 @@
 package com.bsd.exampleapp.springboot.flights.controller;
 
+import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -14,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.bsd.exampleapp.springboot.flights.model.Pigeon;
 import com.bsd.exampleapp.springboot.flights.service.ArrivalsService;
@@ -26,17 +31,14 @@ public class FlightsController {
 	ArrivalsService arrivals;
 	
 	@PostMapping(path="/add")
-	public Pigeon add(@RequestBody Pigeon arrivedPigeon) {
-		return arrivals.add(arrivedPigeon);
-//		try {
-//		} catch(Exception e)
-//		{
-//			return HttpStatus.BAD_REQUEST;
-//		}
-//		
-//		return HttpStatus.CREATED;
+	public ResponseEntity<Object> add(@Valid @RequestBody Pigeon arrivedPigeon) {
+		Pigeon savedPigeon =  arrivals.add(arrivedPigeon);
+		URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
+		        		.buildAndExpand(savedPigeon.getId()).toUri();
+		
+		return ResponseEntity.created(location).body(savedPigeon);
 	}
-
+	
 	@GetMapping(path="/getAll")
 	public List<Pigeon> getAll() {
 		
@@ -69,15 +71,10 @@ public class FlightsController {
 	}
 	
 	@PutMapping(path="update/{id}")
-	public HttpStatus update(@PathVariable(name="id") Long id, @RequestBody Pigeon updatedData) {
-		try {
+	public ResponseEntity<Long> update(@PathVariable(name="id") Long id, @Valid @RequestBody Pigeon updatedData) throws Exception {
 			updatedData.setId(id);
-			arrivals.add(updatedData);
-		} catch(Exception e)
-		{
-			return HttpStatus.NOT_FOUND;
-		}
-		
-		return HttpStatus.OK;
+			arrivals.update(updatedData);
+			
+			return ResponseEntity.ok(id);
 	}
 }

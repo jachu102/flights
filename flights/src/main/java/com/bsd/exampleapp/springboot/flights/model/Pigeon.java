@@ -6,6 +6,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.SequenceGenerator;
+import javax.validation.constraints.NotBlank;
 
 @Entity
 public class Pigeon {
@@ -16,6 +17,7 @@ public class Pigeon {
 	private Long id;
 	
 	@Column
+	@NotBlank
 	private String name;
 	
 	public Long getId() {
