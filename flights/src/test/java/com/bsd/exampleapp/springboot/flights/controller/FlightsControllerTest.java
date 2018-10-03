@@ -2,6 +2,7 @@ package com.bsd.exampleapp.springboot.flights.controller;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -61,10 +62,6 @@ public class FlightsControllerTest {
     
     @Test
     public void update() throws Exception {
-    	Pigeon newPigeon = new Pigeon();
-    	newPigeon.setId(2L);
-    	newPigeon.setName("test 2");
-    	
     	MockHttpServletResponse response = mvc.perform( put("/flight/update/2") 
 			      										.contentType( MediaType.APPLICATION_JSON )
 			      										.content( "{ \"name\" : \"test 2 updated\" }" )
@@ -81,5 +78,23 @@ public class FlightsControllerTest {
     													).andReturn().getResponse();
     	assertThat( response.getStatus() ).isEqualTo(HttpStatus.BAD_REQUEST.value());
     	assertThat( response.getContentAsString() ).contains("Validation Failed");
+    }
+    
+    @Test
+    public void removeExisted() throws Exception {
+    	Long id = 1L;
+    	Mockito.doNothing().when(service).remove(id);
+    	MockHttpServletResponse response = mvc.perform( delete("/flight/remove/" + id) 
+				).andReturn().getResponse();
+    	assertThat( response.getStatus() ).isEqualTo(HttpStatus.OK.value());
+    }
+    
+    @Test
+    public void removeNotExisted() throws Exception {
+    	Long id = 1L;
+    	Mockito.doThrow(new IllegalArgumentException("Expected id does not exist.")).when(service).remove(id);
+    	MockHttpServletResponse response = mvc.perform( delete("/flight/remove/" + id) 
+				).andReturn().getResponse();
+    	assertThat( response.getStatus() ).isEqualTo(HttpStatus.NOT_FOUND.value());
     }
 }

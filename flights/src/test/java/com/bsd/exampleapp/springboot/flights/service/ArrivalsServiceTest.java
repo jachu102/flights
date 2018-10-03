@@ -48,6 +48,7 @@ public class ArrivalsServiceTest {
 	    Mockito.when(flightRepository.save(Mockito.any())).thenReturn(testPigeons.get(0));
 	    Mockito.when(flightRepository.existsById(testPigeons.get(0).getId())).thenReturn(true);
 	    Mockito.when(flightRepository.findById(Mockito.any())).thenReturn( Optional.of(testPigeons.get(0)) );
+	    Mockito.doNothing().when(flightRepository).deleteById(Mockito.anyLong());
 	}
 
 	private void createTestData() {
@@ -64,7 +65,7 @@ public class ArrivalsServiceTest {
 	}
 
 	@Test
-	public void save() {
+	public void add() {
 		assertThat( arrivalsService.add(testPigeons.get(0)) )
 		.isEqualToComparingFieldByField( testPigeons.get(0) );
 	}
@@ -76,5 +77,10 @@ public class ArrivalsServiceTest {
 		
 		assertThat( arrivalsService.get(testPigeons.get(0).getId()).get() )
 		.isEqualToComparingFieldByField( testPigeons.get(0) );
+	}
+	
+	@Test
+	public void remove() {
+		arrivalsService.remove(1L);
 	}
 }

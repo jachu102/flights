@@ -28,11 +28,11 @@ import com.bsd.exampleapp.springboot.flights.service.ArrivalsService;
 public class FlightsController {
 	
 	@Autowired
-	ArrivalsService arrivals;
+	ArrivalsService arrivalsService;
 	
 	@PostMapping(path="/add")
 	public ResponseEntity<Object> add(@Valid @RequestBody Pigeon arrivedPigeon) {
-		Pigeon savedPigeon =  arrivals.add(arrivedPigeon);
+		Pigeon savedPigeon =  arrivalsService.add(arrivedPigeon);
 		URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
 		        		.buildAndExpand(savedPigeon.getId()).toUri();
 		
@@ -42,37 +42,37 @@ public class FlightsController {
 	@GetMapping(path="/getAll")
 	public List<Pigeon> getAll() {
 		
-		return arrivals.getAll();
+		return arrivalsService.getAll();
 	}
 	
 	@GetMapping(path="get/{id}")
 	public Optional<Pigeon> get(@PathVariable(name="id") Long id) {
 		
-		return arrivals.get(id);
+		return arrivalsService.get(id);
 	}
 	
 	@GetMapping(path="findByName")
 	public List<Pigeon> findByName(@RequestParam(name="name") String name) {
 		
-		return arrivals.findByName(name);
+		return arrivalsService.findByName(name);
 	}
 	
 	@DeleteMapping(path="remove/{id}")
-	public HttpStatus remove(@PathVariable(name="id") Long id) {
+	public ResponseEntity<Object> remove(@PathVariable(name="id") Long id) {
 		try {
-			arrivals.remove(id);
+			arrivalsService.remove(id);
 		} catch(Exception e)
 		{
-			return HttpStatus.NOT_FOUND;
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 		}
 		
-		return HttpStatus.OK;
+		return ResponseEntity.status(HttpStatus.OK).build();
 	}
 	
 	@PutMapping(path="update/{id}")
 	public ResponseEntity<Long> update(@PathVariable(name="id") Long id, @Valid @RequestBody Pigeon updatedData) {
 			updatedData.setId(id);
-			arrivals.update(updatedData);
+			arrivalsService.update(updatedData);
 			
 			return ResponseEntity.ok(id);
 	}
