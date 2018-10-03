@@ -83,4 +83,10 @@ public class ArrivalsServiceTest {
 	public void remove() {
 		arrivalsService.remove(1L);
 	}
+	
+	@Test
+	public void get() {
+		assertThat( arrivalsService.get( testPigeons.get(0).getId()).get() )
+		.isEqualToComparingFieldByField( testPigeons.get(0) );
+	}
 }
