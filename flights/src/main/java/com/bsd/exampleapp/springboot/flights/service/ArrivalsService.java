@@ -9,7 +9,7 @@ public interface ArrivalsService {
 	
 	public Pigeon add(Pigeon arrivedPigeon);
 	
-	public void update(Pigeon updatedPigeon) throws Exception;
+	public void update(Pigeon updatedPigeon);
 	
 	public void remove(Long pigeonId);
 	

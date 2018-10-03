@@ -49,7 +49,6 @@ public class FlightsController {
 	public Optional<Pigeon> get(@PathVariable(name="id") Long id) {
 		
 		return arrivals.get(id);
-//		return HttpStatus.NOT_FOUND.toString();
 	}
 	
 	@GetMapping(path="findByName")
@@ -71,7 +70,7 @@ public class FlightsController {
 	}
 	
 	@PutMapping(path="update/{id}")
-	public ResponseEntity<Long> update(@PathVariable(name="id") Long id, @Valid @RequestBody Pigeon updatedData) throws Exception {
+	public ResponseEntity<Long> update(@PathVariable(name="id") Long id, @Valid @RequestBody Pigeon updatedData) {
 			updatedData.setId(id);
 			arrivals.update(updatedData);
 			
