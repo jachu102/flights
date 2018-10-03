@@ -3,6 +3,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+
+import java.util.Arrays;
+
 
 import org.junit.Before;
 import org.junit.Test;
@@ -24,6 +28,7 @@ import com.bsd.exampleapp.springboot.flights.service.ArrivalsService;
 @RunWith(SpringRunner.class)
 @WebMvcTest(value = FlightsController.class, secure = false)
 public class FlightsControllerTest {
+	
 	@Autowired
     private MockMvc mvc;
  
@@ -96,5 +101,18 @@ public class FlightsControllerTest {
     	MockHttpServletResponse response = mvc.perform( delete("/flight/remove/" + id) 
 				).andReturn().getResponse();
     	assertThat( response.getStatus() ).isEqualTo(HttpStatus.NOT_FOUND.value());
+    }
+    
+    @Test
+	public void findByName() throws Exception {
+    	Pigeon pigeon = new Pigeon();
+    	pigeon.setId(3L);
+    	pigeon.setName("test 3");
+    	
+		Mockito.when(service.findByName(pigeon.getName())).thenReturn(Arrays.asList(pigeon));
+		MockHttpServletResponse response = mvc.perform( get("/flight/findByName").param("name", pigeon.getName()) 
+			   ).andReturn().getResponse();
+		assertThat( response.getStatus() ).isEqualTo( HttpStatus.OK.value() );
+		assertThat( response.getContentAsString() ).contains( pigeon.getId().toString() ).contains( pigeon.getName() );
     }
 }
