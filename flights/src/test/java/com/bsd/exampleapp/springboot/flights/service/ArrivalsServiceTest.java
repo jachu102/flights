@@ -14,6 +14,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import com.bsd.exampleapp.springboot.flights.model.Pigeon;
@@ -48,6 +50,10 @@ public class ArrivalsServiceTest {
 	    Mockito.when(flightRepository.save(Mockito.any())).thenReturn(testPigeons.get(0));
 	    Mockito.when(flightRepository.existsById(testPigeons.get(0).getId())).thenReturn(true);
 	    Mockito.when(flightRepository.findById(Mockito.any())).thenReturn( Optional.of(testPigeons.get(0)) );
+	    Mockito.doNothing().when(flightRepository).deleteById(Mockito.anyLong());
+	    String[] sortCols = {"name"};
+		Sort sort = new Sort(Direction.DESC, sortCols);
+	    Mockito.when(flightRepository.findAll(sort)).thenReturn(testPigeons);
 	}
 
 	private void createTestData() {
@@ -56,15 +62,9 @@ public class ArrivalsServiceTest {
 	    newPigeon.setName("test");
 	    testPigeons.add(newPigeon);
 	}
-	
-	@Test
-	public void findByName() {
-		assertThat( arrivalsService.findByName(testPigeons.get(0).getName()).get(0) )
-		.isEqualToComparingFieldByField( testPigeons.get(0) );
-	}
 
 	@Test
-	public void save() {
+	public void add() {
 		assertThat( arrivalsService.add(testPigeons.get(0)) )
 		.isEqualToComparingFieldByField( testPigeons.get(0) );
 	}
@@ -77,4 +77,27 @@ public class ArrivalsServiceTest {
 		assertThat( arrivalsService.get(testPigeons.get(0).getId()).get() )
 		.isEqualToComparingFieldByField( testPigeons.get(0) );
 	}
+	
+	@Test
+	public void remove() {
+		arrivalsService.remove(1L);
+	}
+	
+	@Test
+	public void get() {
+		assertThat( arrivalsService.get( testPigeons.get(0).getId()).get() )
+		.isEqualToComparingFieldByField( testPigeons.get(0) );
+	}
+	
+	@Test
+	public void getAll() {
+		assertThat( arrivalsService.getAll().size() ).isEqualTo( testPigeons.size() );
+	}
+	
+	@Test
+	public void findByName() {
+		assertThat( arrivalsService.findByName(testPigeons.get(0).getName()).get(0) )
+		.isEqualToComparingFieldByField( testPigeons.get(0) );
+	}
+	
 }
