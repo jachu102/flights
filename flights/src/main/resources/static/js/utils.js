@@ -15,6 +15,8 @@ function buildRow(no, pigeon){
 function resetData(){
 	$("#name").val("");
 	$("#no").val("");
+	$("#footer").val("");
+	$("#modalFooter").val("");
 }
 
 function isAddForm(no){
