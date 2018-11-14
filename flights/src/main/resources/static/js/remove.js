@@ -15,7 +15,7 @@ $( document ).ready(function() {
 	        	rowToRemove.remove();
 	        },
 	        error : function(e) {
-	        	$("#getResultDiv").html("<strong>Error</strong>");
+	        	$("#footer").html('<p class="bg-danger text-white mx-auto">Not found. Refresh page. </p>');
 				console.log("ERROR: ", e);
 	        }
 	    }); 

@@ -31,7 +31,7 @@ $( document ).ready(function() {
 		        	$("#modalAdd").modal('hide');
 		        },
 		        error : function(e) {
-		        	$("#getResultDiv").html("<strong>Error</strong>");
+		        	$("#modalFooter").html('<p class="bg-danger text-white mx-auto">'+ e.responseJSON.message +' Refresh page. </p>');
 					console.log("ERROR: ", e);
 		        }
 		 }); 
