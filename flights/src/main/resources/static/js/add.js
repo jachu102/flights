@@ -9,7 +9,7 @@ $( document ).ready(function() {
 	})
 	
 	$("#pigeonForm").submit(function(event) {
-		if( ! isAddForm($("#no")) ) 
+		if( ! isAddForm($("#id")) ) 
 			return;
 		event.preventDefault();
 		
@@ -20,18 +20,18 @@ $( document ).ready(function() {
 		 $.ajax({
 		        type : "POST",
 				contentType : "application/json",
-				url : window.location + "/flight/add" + "?name=" + formPigeon.name,
+				url : window.location + "/flight/add",
 				dataType: 'json',
 				data : JSON.stringify( formPigeon ),
 		        success: function(result){
 		        	no++;
-		        	var row = buildRow(no, formPigeon.name);
+		        	var row = buildRow(no, result);
 		        	$('#pigeonsTable tbody').append(row);
 		        	resetData();
 		        	$("#modalAdd").modal('hide');
 		        },
 		        error : function(e) {
-		        	$("#getResultDiv").html("<strong>Error</strong>");
+		        	$("#modalFooter").html('<p class="bg-danger text-white mx-auto">'+ e.responseJSON.message +' Refresh page. </p>');
 					console.log("ERROR: ", e);
 		        }
 		 }); 

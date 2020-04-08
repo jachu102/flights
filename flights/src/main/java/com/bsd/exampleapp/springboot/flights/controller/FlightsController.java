@@ -1,10 +1,14 @@
 package com.bsd.exampleapp.springboot.flights.controller;
 
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.net.URI;
 import java.util.List;
+import java.util.Optional;
 
+import javax.validation.Valid;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -12,66 +16,64 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import com.bsd.exampleapp.springboot.flights.dto.PigeonDto;
-
+import com.bsd.exampleapp.springboot.flights.model.Pigeon;
+import com.bsd.exampleapp.springboot.flights.service.ArrivalsService;
 
 @RestController
 @RequestMapping(path="flight")
 public class FlightsController {
 	
-	String[] defaultValues = {"gołąb 1", "gołąb 2", "gołąb 3"};
-	List<String> flights = new ArrayList<String>(Arrays.asList(defaultValues));
+	@Autowired
+	ArrivalsService arrivalsService;
 	
 	@PostMapping(path="/add")
-	public HttpStatus add(@RequestBody PigeonDto newData) {
-		try {
-			flights.add(newData.getName());
-		} catch(Exception e)
-		{
-			return HttpStatus.BAD_REQUEST;
-		}
+	public ResponseEntity<Object> add(@Valid @RequestBody Pigeon arrivedPigeon) {
+		Pigeon savedPigeon =  arrivalsService.add(arrivedPigeon);
+		URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
+		        		.buildAndExpand(savedPigeon.getId()).toUri();
 		
-		return HttpStatus.CREATED;
+		return ResponseEntity.created(location).body(savedPigeon);
 	}
-
+	
 	@GetMapping(path="/getAll")
-	public Iterable<String> getAll() {
+	public List<Pigeon> getAll() {
 		
-		return flights;
+		return arrivalsService.getAll();
 	}
 	
-	@GetMapping(path="find/{index}")
-	public String find(@PathVariable(name="index") Integer index) {
-		if(--index<0 | index>=flights.size()) {
-			return HttpStatus.NOT_FOUND.toString();
-		}
+	@GetMapping(path="get/{id}")
+	public Optional<Pigeon> get(@PathVariable(name="id") Long id) {
 		
-		return flights.get(index);
+		return arrivalsService.get(id);
 	}
 	
-	@DeleteMapping(path="remove/{index}")
-	public HttpStatus remove(@PathVariable(name="index") Integer index) {
+	@GetMapping(path="findByName")
+	public List<Pigeon> findByName(@RequestParam(name="name") String name) {
+		
+		return arrivalsService.findByName(name);
+	}
+	
+	@DeleteMapping(path="remove/{id}")
+	public ResponseEntity<Object> remove(@PathVariable(name="id") Long id) {
 		try {
-			flights.remove((int) index);
+			arrivalsService.remove(id);
 		} catch(Exception e)
 		{
-			return HttpStatus.NOT_FOUND;
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 		}
 		
-		return HttpStatus.OK;
+		return ResponseEntity.status(HttpStatus.OK).build();
 	}
 	
-	@PutMapping(path="update/{index}")
-	public HttpStatus update(@PathVariable(name="index") Integer index, @RequestBody PigeonDto updatedData) {
-		try {
-			flights.set( (int) index, updatedData.getName() );
-		} catch(Exception e)
-		{
-			return HttpStatus.NOT_FOUND;
-		}
-		
-		return HttpStatus.OK;
+	@PutMapping(path="update/{id}")
+	public ResponseEntity<Long> update(@PathVariable(name="id") Long id, @Valid @RequestBody Pigeon updatedData) {
+			updatedData.setId(id);
+			arrivalsService.update(updatedData);
+			
+			return ResponseEntity.ok(id);
 	}
 }

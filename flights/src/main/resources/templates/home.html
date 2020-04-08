@@ -23,8 +23,8 @@
 	  <table id="pigeonsTable" class="table table-bordered table-sm">
 			<thead class="thead-light">
 				<tr>
-					<th>Lp</th>
-					<th>Gołąb</th>
+					<th class="text-center">Lp</th>
+					<th class="text-center">Gołąb</th>
 					<th></th>
 				</tr>
 			</thead>
@@ -53,18 +53,22 @@
 								<input type="text" class="form-control" id="name" placeholder="Podaj nazwę gołębia" required/>
 							</div>
 						</div>
-							<input type="hidden" class="form-control" id="no"/> 
+							<input type="hidden" class="form-control" id="id"/>
+							<input type="hidden" class="form-control" id="no"/>
 						<button style="margin-bottom:10px" type="submit" class="btn btn-info btn-lg">Zapisz</button>
 						<button style="margin-bottom:10px" type="button" class="btn btn-secondary btn-lg" data-dismiss="modal">Anuluj</button>
 					</form>
 				</div>
 	        </div>
-	        <div class="modal-footer">
+	        <div class="modal-footer" id="modalFooter">
 	        </div>
 	      </div>
 	      
 	    </div>
 	  </div>
+	
+	<div id="footer">
+	</div>
 	</div>	  
 </div>
 
