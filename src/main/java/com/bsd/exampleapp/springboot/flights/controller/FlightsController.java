@@ -25,7 +25,6 @@ public class FlightsController {
 		Pigeon savedPigeon =  arrivalsService.add(arrivedPigeon);
 		URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
 		        		.buildAndExpand(savedPigeon.getId()).toUri();
-		
 		return ResponseEntity.created(location).body(savedPigeon);
 	}
 	
@@ -55,15 +54,17 @@ public class FlightsController {
 		{
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 		}
-		
 		return ResponseEntity.status(HttpStatus.OK).build();
 	}
 	
 	@PutMapping(path="update/{id}")
 	public ResponseEntity<Long> update(@PathVariable(name="id") Long id, @Validated @RequestBody Pigeon updatedData) {
 			updatedData.setId(id);
+		try {
 			arrivalsService.update(updatedData);
-			
-			return ResponseEntity.ok(id);
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+		}
+		return ResponseEntity.ok(id);
 	}
 }
