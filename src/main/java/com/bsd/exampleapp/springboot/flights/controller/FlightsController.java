@@ -1,27 +1,17 @@
 package com.bsd.exampleapp.springboot.flights.controller;
 
-import java.net.URI;
-import java.util.List;
-import java.util.Optional;
-
-import javax.validation.Valid;
-
+import com.bsd.exampleapp.springboot.flights.model.Pigeon;
+import com.bsd.exampleapp.springboot.flights.service.ArrivalsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import com.bsd.exampleapp.springboot.flights.model.Pigeon;
-import com.bsd.exampleapp.springboot.flights.service.ArrivalsService;
+import java.net.URI;
+import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping(path="flight")
@@ -31,7 +21,7 @@ public class FlightsController {
 	ArrivalsService arrivalsService;
 	
 	@PostMapping(path="/add")
-	public ResponseEntity<Object> add(@Valid @RequestBody Pigeon arrivedPigeon) {
+	public ResponseEntity<Object> add(@Validated @RequestBody Pigeon arrivedPigeon) {
 		Pigeon savedPigeon =  arrivalsService.add(arrivedPigeon);
 		URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
 		        		.buildAndExpand(savedPigeon.getId()).toUri();
@@ -70,7 +60,7 @@ public class FlightsController {
 	}
 	
 	@PutMapping(path="update/{id}")
-	public ResponseEntity<Long> update(@PathVariable(name="id") Long id, @Valid @RequestBody Pigeon updatedData) {
+	public ResponseEntity<Long> update(@PathVariable(name="id") Long id, @Validated @RequestBody Pigeon updatedData) {
 			updatedData.setId(id);
 			arrivalsService.update(updatedData);
 			

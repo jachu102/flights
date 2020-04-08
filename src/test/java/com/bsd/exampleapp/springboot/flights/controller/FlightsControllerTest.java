@@ -1,17 +1,6 @@
 package com.bsd.exampleapp.springboot.flights.controller;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
-import static org.hamcrest.Matchers.is;
-
-
-import java.util.Arrays;
-import java.util.Optional;
-
+import com.bsd.exampleapp.springboot.flights.model.Pigeon;
+import com.bsd.exampleapp.springboot.flights.service.ArrivalsService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -19,16 +8,17 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-import com.bsd.exampleapp.springboot.flights.controller.FlightsController;
-import com.bsd.exampleapp.springboot.flights.model.Pigeon;
-import com.bsd.exampleapp.springboot.flights.service.ArrivalsService;
+import java.util.Arrays;
+import java.util.Optional;
+
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
 @WebMvcTest(value = FlightsController.class, secure = false)
@@ -59,13 +49,33 @@ public class FlightsControllerTest {
     }
     
     @Test
-    public void shouldNotAddNewArrivedPigeon_whenNotValidBody() throws Exception {
+    public void shouldNotAddNewArrivedPigeon_whenEmptyFieldValue() throws Exception {
     	mvc.perform( post("/flight/add") 
 					.contentType( MediaType.APPLICATION_JSON )
 					.content( "{ \"name\" : \"   \" }" ) )
     		.andExpect( status().isBadRequest() )
-    		.andExpect( jsonPath("$.message").value("Validation Failed") );
+    		.andExpect( jsonPath("$.message").value("Not allowed value of input data field.") )
+			.andExpect( jsonPath("$.details").value("Field 'name' must not be blank.") );
     }
+
+	@Test
+	public void shouldNotAddNewArrivedPigeon_whenNotValidFieldKey() throws Exception {
+		mvc.perform( post("/flight/add")
+				.contentType( MediaType.APPLICATION_JSON )
+				.content( "{ \"wrongName\" : \"test 1\" }" ) )
+				.andExpect( status().isBadRequest() )
+				.andExpect( jsonPath("$.message").value("Not relevant input data.") );
+	}
+
+	@Test
+	public void shouldNotAddNewArrivedPigeon_whenAddedNotValidField() throws Exception {
+		mvc.perform( post("/flight/add")
+				.contentType( MediaType.APPLICATION_JSON )
+				.content( "{ \"name\" : \"test 1\", \"wrongName\" : \"test 2\" }" ) )
+				.andExpect( status().isBadRequest() )
+				.andExpect( jsonPath("$.message").value("Not relevant input data.") );
+		;
+	}
     
     @Test
 	public void shouldGetAllArrivedPigeons() throws Exception {
@@ -132,13 +142,14 @@ public class FlightsControllerTest {
     }
     
     @Test
-    public void shouldNotUpdate_whenNotValidBody() throws Exception {
+    public void shouldNotUpdate_whenNotFieldFilled() throws Exception {
     	
     	mvc.perform( put("/flight/update/2") 
 					.contentType( MediaType.APPLICATION_JSON )
 					.content( "{  }" ) )
     		.andExpect( status().isBadRequest() )
-    		.andExpect( jsonPath("$.message").value("Validation Failed") );;
+    		.andExpect( jsonPath("$.message").value("Not allowed value of input data field.") )
+			.andExpect( jsonPath("$.details").value("Field 'name' must not be blank.") );;
     }
     
 }
