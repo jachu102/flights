@@ -1,15 +1,14 @@
 package com.bsd.exampleapp.springboot.flights.service;
 
-import java.util.List;
-import java.util.Optional;
-
+import com.bsd.exampleapp.springboot.flights.model.Pigeon;
+import com.bsd.exampleapp.springboot.flights.repository.FlightRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 
-import com.bsd.exampleapp.springboot.flights.model.Pigeon;
-import com.bsd.exampleapp.springboot.flights.repository.FlightRepository;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ArrivalsServiceImpl implements ArrivalsService {
@@ -26,7 +25,6 @@ public class ArrivalsServiceImpl implements ArrivalsService {
 	public void update(Pigeon arrivedPigeon) {
 		if( arrivedPigeons.existsById(arrivedPigeon.getId()) ) {
 			arrivedPigeons.save(arrivedPigeon);
-			
 			return;
 		}
 		throw new IllegalArgumentException("Requested id not found.");
@@ -44,8 +42,7 @@ public class ArrivalsServiceImpl implements ArrivalsService {
 
 	@Override
 	public List<Pigeon> getAll() {
-		String[] sortCols = {"name"};
-		Sort sort = new Sort(Direction.DESC, sortCols);
+		Sort sort = new Sort(Direction.DESC, new String[]{"name"});
 		
 		return arrivedPigeons.findAll(sort);
 	}

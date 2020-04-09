@@ -50,8 +50,7 @@ public class FlightsController {
 	public ResponseEntity<Object> remove(@PathVariable(name="id") Long id) {
 		try {
 			arrivalsService.remove(id);
-		} catch(Exception e)
-		{
+		} catch(Exception e) {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 		}
 		return ResponseEntity.status(HttpStatus.OK).build();
