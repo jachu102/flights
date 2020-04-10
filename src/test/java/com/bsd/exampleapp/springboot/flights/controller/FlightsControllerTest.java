@@ -46,7 +46,9 @@ public class FlightsControllerTest {
         mvc.perform(post("/flight/add")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{ \"name\" : \"test 2\" }"))
-				.andExpect(status().isCreated());
+				.andExpect(status().isCreated())
+                .andExpect(jsonPath("$..name").value(newPigeon.getName()))
+                .andExpect(jsonPath("$..id").value(newPigeon.getId().intValue()));
     }
 
     @Test
@@ -54,6 +56,16 @@ public class FlightsControllerTest {
         mvc.perform(post("/flight/add")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{ \"name\" : \"   \" }"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("Not allowed value of input data field."))
+                .andExpect(jsonPath("$.details").value("Field 'name' must not be blank."));
+    }
+
+    @Test
+    public void shouldNotAddNewArrivedPigeon_whenNullFieldValue() throws Exception {
+        mvc.perform(post("/flight/add")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{ \"name\" : null }"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("Not allowed value of input data field."))
                 .andExpect(jsonPath("$.details").value("Field 'name' must not be blank."));
@@ -130,7 +142,9 @@ public class FlightsControllerTest {
         Long id = 1L;
         Mockito.doThrow(new IllegalArgumentException("Expected id does not exist.")).when(arrivalsService).remove(id);
         mvc.perform(delete("/flight/remove/" + id))
-                .andExpect(status().isNotFound());
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message").value("Data not exists."))
+                .andExpect(jsonPath("$.details").value("Expected id does not exist."));
     }
 
     @Test
@@ -139,6 +153,16 @@ public class FlightsControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{ \"name\" : \"test 2 updated\" }"))
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    public void shouldNotUpdate_WhenDifferentId() throws Exception {
+        mvc.perform(put("/flight/update/2")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{ \"id\" : 999, \"name\" : \"test 2 updated\" }"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("No integrity of input data."))
+                .andExpect(jsonPath("$.details").value("URI id and id not match."));
     }
 
     @Test
@@ -158,7 +182,8 @@ public class FlightsControllerTest {
 		mvc.perform(put("/flight/update/" + id)
 				.contentType(MediaType.APPLICATION_JSON)
 				.content("{ \"name\" : \"test 2 updated\" }"))
-				.andExpect(status().isNotFound());
+				.andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message").value("Data not exists."))
+                .andExpect(jsonPath("$.details").value("Expected id does not exist."));
 	}
-
 }

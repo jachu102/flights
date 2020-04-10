@@ -70,7 +70,7 @@ public class ArrivalsServiceTest {
 	public ExpectedException exceptionRule = ExpectedException.none();
 
 	@Test
-	public void souldAdd() {
+	public void shouldAdd() {
 		Pigeon newPigeon = new Pigeon();
 		newPigeon.setName("test");
 
@@ -100,7 +100,7 @@ public class ArrivalsServiceTest {
 				.thenReturn(false);
 
 		exceptionRule.expect(IllegalArgumentException.class);
-		exceptionRule.expectMessage("Requested id not found.");
+		exceptionRule.expectMessage("Expected id does not exist.");
 		arrivalsService.update(changedPigeon);
 	}
 	

@@ -3,6 +3,7 @@ package com.bsd.exampleapp.springboot.flights.controller;
 import com.bsd.exampleapp.springboot.flights.model.Pigeon;
 import com.bsd.exampleapp.springboot.flights.service.ArrivalsService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -30,40 +31,37 @@ public class FlightsController {
 	
 	@GetMapping(path="/getAll")
 	public List<Pigeon> getAll() {
-		
 		return arrivalsService.getAll();
 	}
 	
 	@GetMapping(path="get/{id}")
 	public Optional<Pigeon> get(@PathVariable(name="id") Long id) {
-		
 		return arrivalsService.get(id);
 	}
 	
 	@GetMapping(path="findByName")
 	public List<Pigeon> findByName(@RequestParam(name="name") String name) {
-		
 		return arrivalsService.findByName(name);
 	}
 	
 	@DeleteMapping(path="remove/{id}")
 	public ResponseEntity<Object> remove(@PathVariable(name="id") Long id) {
-		try {
-			arrivalsService.remove(id);
-		} catch(Exception e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-		}
+		arrivalsService.remove(id);
 		return ResponseEntity.status(HttpStatus.OK).build();
 	}
 	
 	@PutMapping(path="update/{id}")
 	public ResponseEntity<Long> update(@PathVariable(name="id") Long id, @Validated @RequestBody Pigeon updatedData) {
-			updatedData.setId(id);
-		try {
-			arrivalsService.update(updatedData);
-		} catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-		}
+		ensureIdIntegrity(id, updatedData);
+		arrivalsService.update(updatedData);
 		return ResponseEntity.ok(id);
+	}
+
+	private void ensureIdIntegrity(@PathVariable(name = "id") Long id, @RequestBody @Validated Pigeon updatedData) {
+		if (updatedData.getId()==null) {
+			updatedData.setId(id);
+		} else if ( ! id.equals(updatedData.getId())) {
+			throw new DataIntegrityViolationException("URI id and id not match.");
+		}
 	}
 }

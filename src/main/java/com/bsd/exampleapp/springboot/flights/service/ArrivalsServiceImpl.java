@@ -27,7 +27,7 @@ public class ArrivalsServiceImpl implements ArrivalsService {
 			arrivedPigeons.save(arrivedPigeon);
 			return;
 		}
-		throw new IllegalArgumentException("Requested id not found.");
+		throw new IllegalArgumentException("Expected id does not exist.");
 	}
 
 	@Override
@@ -43,7 +43,6 @@ public class ArrivalsServiceImpl implements ArrivalsService {
 	@Override
 	public List<Pigeon> getAll() {
 		Sort sort = new Sort(Direction.DESC, new String[]{"name"});
-		
 		return arrivedPigeons.findAll(sort);
 	}
 
