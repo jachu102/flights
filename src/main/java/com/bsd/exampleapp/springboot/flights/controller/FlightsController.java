@@ -5,12 +5,9 @@ import com.bsd.exampleapp.springboot.flights.service.ArrivalsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,40 +18,42 @@ public class FlightsController {
 	@Autowired
 	ArrivalsService arrivalsService;
 	
-	@PostMapping(path="/add")
-	public ResponseEntity<Object> add(@Validated @RequestBody Pigeon arrivedPigeon) {
-		Pigeon savedPigeon =  arrivalsService.add(arrivedPigeon);
-		URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
-		        		.buildAndExpand(savedPigeon.getId()).toUri();
-		return ResponseEntity.created(location).body(savedPigeon);
+	@RequestMapping(value = "add", method = RequestMethod.POST)
+	@ResponseStatus(HttpStatus.CREATED)
+	public Pigeon add(@Validated @RequestBody Pigeon arrivedPigeon) {
+		return arrivalsService.add(arrivedPigeon);
 	}
 	
-	@GetMapping(path="/getAll")
+	@RequestMapping(value = "getAll", method = RequestMethod.GET)
+	@ResponseStatus(HttpStatus.OK)
 	public List<Pigeon> getAll() {
 		return arrivalsService.getAll();
 	}
 	
-	@GetMapping(path="get/{id}")
+	@RequestMapping(value = "get/{id}", method = RequestMethod.GET)
+	@ResponseStatus(HttpStatus.OK)
 	public Optional<Pigeon> get(@PathVariable(name="id") Long id) {
 		return arrivalsService.get(id);
 	}
 	
-	@GetMapping(path="findByName")
+	@RequestMapping(value = "findByName", method = RequestMethod.GET)
+	@ResponseStatus(HttpStatus.OK)
 	public List<Pigeon> findByName(@RequestParam(name="name") String name) {
 		return arrivalsService.findByName(name);
 	}
 	
-	@DeleteMapping(path="remove/{id}")
-	public ResponseEntity<Object> remove(@PathVariable(name="id") Long id) {
+	@RequestMapping(value = "remove/{id}", method = RequestMethod.DELETE)
+	@ResponseStatus(HttpStatus.OK)
+	public void remove(@PathVariable(name="id") Long id) {
 		arrivalsService.remove(id);
-		return ResponseEntity.status(HttpStatus.OK).build();
 	}
 	
-	@PutMapping(path="update/{id}")
-	public ResponseEntity<Long> update(@PathVariable(name="id") Long id, @Validated @RequestBody Pigeon updatedData) {
+	@RequestMapping(value = "update/{id}", method = RequestMethod.PUT)
+	@ResponseStatus(HttpStatus.OK)
+	public Long update(@PathVariable(name="id") Long id, @Validated @RequestBody Pigeon updatedData) {
 		ensureIdIntegrity(id, updatedData);
 		arrivalsService.update(updatedData);
-		return ResponseEntity.ok(id);
+		return id;
 	}
 
 	private void ensureIdIntegrity(@PathVariable(name = "id") Long id, @RequestBody @Validated Pigeon updatedData) {
