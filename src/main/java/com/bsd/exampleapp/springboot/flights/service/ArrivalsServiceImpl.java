@@ -50,5 +50,4 @@ public class ArrivalsServiceImpl implements ArrivalsService {
 	public List<Pigeon> findByName(String name) {
 		return arrivedPigeons.findByName(name);
 	}
-	
 }

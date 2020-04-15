@@ -18,5 +18,4 @@ public interface ArrivalsService {
 	List<Pigeon> getAll();
 	
 	List<Pigeon> findByName(String name);
-
 }

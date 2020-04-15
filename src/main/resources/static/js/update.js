@@ -21,8 +21,9 @@ $( document ).ready(function() {
 			return;
 		event.preventDefault();
 		var formPigeon = {
-    			name : $("#name").val(),
     			id : $("#id").val(),
+    			name : $("#name").val(),
+    			ownerId : 1
     	}
     	no = $("#no").val()-1;
     	

@@ -14,7 +14,8 @@ $( document ).ready(function() {
 		event.preventDefault();
 		
 		var formPigeon = {
-    			name : $("#name").val()
+    			name : $("#name").val(),
+    			ownerId : 1
     	}  
 		
 		 $.ajax({

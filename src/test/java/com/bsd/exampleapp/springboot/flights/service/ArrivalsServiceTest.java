@@ -2,6 +2,7 @@ package com.bsd.exampleapp.springboot.flights.service;
 
 import com.bsd.exampleapp.springboot.flights.model.Pigeon;
 import com.bsd.exampleapp.springboot.flights.repository.FlightRepository;
+import com.bsd.exampleapp.springboot.flights.repository.OwnerRepository;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -26,7 +27,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class ArrivalsServiceTest {
 	
 	@TestConfiguration
-    static class EmployeeServiceImplTestContextConfiguration {
+    static class TestContextConfiguration {
         @Bean
         public ArrivalsService arrivalsService() {
             return new ArrivalsServiceImpl();
@@ -38,6 +39,9 @@ public class ArrivalsServiceTest {
 	
 	@MockBean
 	private FlightRepository flightRepository;
+
+	@MockBean
+	private OwnerRepository ownerRepository;
 	
 	private List<Pigeon> storedPigeons = new ArrayList<Pigeon>();
 	
@@ -60,10 +64,7 @@ public class ArrivalsServiceTest {
 	}
 
 	private void createTestData() {
-		Pigeon pigeon = new Pigeon();
-		pigeon.setId(1L);
-	    pigeon.setName("test");
-	    storedPigeons.add(pigeon);
+	    storedPigeons.add(new Pigeon(1L, "test", null));
 	}
 
 	@Rule
@@ -71,8 +72,7 @@ public class ArrivalsServiceTest {
 
 	@Test
 	public void shouldAdd() {
-		Pigeon newPigeon = new Pigeon();
-		newPigeon.setName("test");
+		Pigeon newPigeon = new Pigeon("test", null);
 
 		assertThat( arrivalsService.add(newPigeon) )
 				.satisfies( result -> {
@@ -92,9 +92,7 @@ public class ArrivalsServiceTest {
 
 	@Test
 	public void shouldThrowException_whenUpdateNotExisting() {
-		Pigeon changedPigeon = new Pigeon();
-		changedPigeon.setId(9L);
-		changedPigeon.setName("test 2");
+		Pigeon changedPigeon = new Pigeon(9L, "test 2", null);
 
 		Mockito.when(flightRepository.existsById(storedPigeons.get(0).getId()))
 				.thenReturn(false);
