@@ -14,7 +14,8 @@ $( document ).ready(function() {
 		event.preventDefault();
 		
 		var formPigeon = {
-    			name : $("#name").val()
+    			name : $("#name").val(),
+    			ownerId : 1
     	}  
 		
 		 $.ajax({
@@ -31,7 +32,9 @@ $( document ).ready(function() {
 		        	$("#modalAdd").modal('hide');
 		        },
 		        error : function(e) {
-		        	$("#modalFooter").html('<p class="bg-danger text-white mx-auto">'+ e.responseJSON.message +' Refresh page. </p>');
+		        	$("#modalFooter").html('<p class="bg-danger text-white mx-auto">'+ e.responseJSON.message + '<BR>'
+		        	+ e.responseJSON.details + '<BR>'
+		        	+ ' Refresh page. </p>');
 					console.log("ERROR: ", e);
 		        }
 		 }); 

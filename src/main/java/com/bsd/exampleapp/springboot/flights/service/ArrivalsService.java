@@ -1,22 +1,21 @@
 package com.bsd.exampleapp.springboot.flights.service;
 
+import com.bsd.exampleapp.springboot.flights.model.Pigeon;
+
 import java.util.List;
 import java.util.Optional;
 
-import com.bsd.exampleapp.springboot.flights.model.Pigeon;
-
 public interface ArrivalsService {
 	
-	public Pigeon add(Pigeon arrivedPigeon);
+	Pigeon add(Pigeon arrivedPigeon);
 	
-	public void update(Pigeon updatedPigeon);
+	void update(Pigeon updatedPigeon);
 	
-	public void remove(Long pigeonId);
+	void remove(Long pigeonId);
 	
-	public Optional<Pigeon> get(Long id);
+	Optional<Pigeon> get(Long id);
 	
-	public List<Pigeon> getAll();
+	List<Pigeon> getAll();
 	
-	public List<Pigeon> findByName(String name);
-
+	List<Pigeon> findByName(String name);
 }

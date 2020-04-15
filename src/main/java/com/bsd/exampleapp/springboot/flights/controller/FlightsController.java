@@ -1,27 +1,17 @@
 package com.bsd.exampleapp.springboot.flights.controller;
 
-import java.net.URI;
-import java.util.List;
-import java.util.Optional;
-
-import javax.validation.Valid;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-
+import com.bsd.exampleapp.springboot.flights.service.PigeonConverter;
+import com.bsd.exampleapp.springboot.flights.dto.PigeonDto;
 import com.bsd.exampleapp.springboot.flights.model.Pigeon;
 import com.bsd.exampleapp.springboot.flights.service.ArrivalsService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpStatus;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping(path="flight")
@@ -29,51 +19,55 @@ public class FlightsController {
 	
 	@Autowired
 	ArrivalsService arrivalsService;
-	
-	@PostMapping(path="/add")
-	public ResponseEntity<Object> add(@Valid @RequestBody Pigeon arrivedPigeon) {
-		Pigeon savedPigeon =  arrivalsService.add(arrivedPigeon);
-		URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
-		        		.buildAndExpand(savedPigeon.getId()).toUri();
-		
-		return ResponseEntity.created(location).body(savedPigeon);
+
+	@Autowired
+	PigeonConverter pigeonConverter;
+
+	@PostMapping(value = "add")
+	@ResponseStatus(HttpStatus.CREATED)
+	public Pigeon add(@Validated @RequestBody PigeonDto pigeonDto) {
+		Pigeon arrivedPigeon = pigeonConverter.convert(pigeonDto);
+		return arrivalsService.add(arrivedPigeon);
 	}
 	
-	@GetMapping(path="/getAll")
+	@GetMapping(value = "getAll")
+	@ResponseStatus(HttpStatus.OK)
 	public List<Pigeon> getAll() {
-		
 		return arrivalsService.getAll();
 	}
 	
-	@GetMapping(path="get/{id}")
+	@GetMapping(value = "get/{id}")
+	@ResponseStatus(HttpStatus.OK)
 	public Optional<Pigeon> get(@PathVariable(name="id") Long id) {
-		
 		return arrivalsService.get(id);
 	}
 	
-	@GetMapping(path="findByName")
+	@GetMapping(value = "findByName")
+	@ResponseStatus(HttpStatus.OK)
 	public List<Pigeon> findByName(@RequestParam(name="name") String name) {
-		
 		return arrivalsService.findByName(name);
 	}
 	
-	@DeleteMapping(path="remove/{id}")
-	public ResponseEntity<Object> remove(@PathVariable(name="id") Long id) {
-		try {
-			arrivalsService.remove(id);
-		} catch(Exception e)
-		{
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-		}
-		
-		return ResponseEntity.status(HttpStatus.OK).build();
+	@DeleteMapping(value = "remove/{id}")
+	@ResponseStatus(HttpStatus.OK)
+	public void remove(@PathVariable(name="id") Long id) {
+		arrivalsService.remove(id);
 	}
 	
-	@PutMapping(path="update/{id}")
-	public ResponseEntity<Long> update(@PathVariable(name="id") Long id, @Valid @RequestBody Pigeon updatedData) {
+	@PutMapping(value = "update/{id}")
+	@ResponseStatus(HttpStatus.OK)
+	public Long update(@PathVariable(name="id") Long id, @Validated @RequestBody PigeonDto updatedData) {
+		ensureIdIntegrity(id, updatedData);
+		Pigeon convertedPigeon = pigeonConverter.convert(updatedData);
+		arrivalsService.update(convertedPigeon);
+		return id;
+	}
+
+	private void ensureIdIntegrity(Long id, PigeonDto updatedData) {
+		if (updatedData.getId()==null) {
 			updatedData.setId(id);
-			arrivalsService.update(updatedData);
-			
-			return ResponseEntity.ok(id);
+		} else if ( ! id.equals(updatedData.getId())) {
+			throw new DataIntegrityViolationException("URI id and id not match.");
+		}
 	}
 }

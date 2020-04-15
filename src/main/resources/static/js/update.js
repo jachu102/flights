@@ -21,10 +21,11 @@ $( document ).ready(function() {
 			return;
 		event.preventDefault();
 		var formPigeon = {
-    			name : $("#name").val(),
     			id : $("#id").val(),
-    			no : ( $("#no").val()-1 )
+    			name : $("#name").val(),
+    			ownerId : 1
     	}
+    	no = $("#no").val()-1;
     	
     	$.ajax({
 	        type : "PUT",
@@ -35,10 +36,12 @@ $( document ).ready(function() {
 	        success: function(){
 	        	resetData();
 	        	$("#modalAdd").modal('hide');
-	        	$('#pigeonsTable tbody').find("tr:eq("+ formPigeon.no +")").find("td:eq(1)").html(formPigeon.name);
+	        	$('#pigeonsTable tbody').find("tr:eq("+ no +")").find("td:eq(1)").html(formPigeon.name);
 	        },
 	        error : function(e) {
-	        	$("#modalFooter").html('<p class="bg-danger text-white mx-auto">'+ e.responseJSON.message +' Refresh page. </p>');
+	        	$("#modalFooter").html('<p class="bg-danger text-white mx-auto">'+ e.responseJSON.message + '<BR>'
+                + e.responseJSON.details + '<BR>'
+                + ' Refresh page. </p>');
 				console.log("ERROR: ", e);
 	        }
 	 });

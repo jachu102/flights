@@ -1,13 +1,12 @@
 package com.bsd.exampleapp.springboot.flights.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
+import com.bsd.exampleapp.springboot.flights.model.Pigeon;
+import com.bsd.exampleapp.springboot.flights.repository.FlightRepository;
+import com.bsd.exampleapp.springboot.flights.repository.OwnerRepository;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,16 +17,17 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import com.bsd.exampleapp.springboot.flights.model.Pigeon;
-import com.bsd.exampleapp.springboot.flights.repository.FlightRepository;
-import com.bsd.exampleapp.springboot.flights.service.ArrivalsService;
-import com.bsd.exampleapp.springboot.flights.service.ArrivalsServiceImpl;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(SpringRunner.class)
 public class ArrivalsServiceTest {
 	
 	@TestConfiguration
-    static class EmployeeServiceImplTestContextConfiguration {
+    static class TestContextConfiguration {
         @Bean
         public ArrivalsService arrivalsService() {
             return new ArrivalsServiceImpl();
@@ -39,65 +39,90 @@ public class ArrivalsServiceTest {
 	
 	@MockBean
 	private FlightRepository flightRepository;
+
+	@MockBean
+	private OwnerRepository ownerRepository;
 	
-	private List<Pigeon> testPigeons = new ArrayList<Pigeon>();
+	private List<Pigeon> storedPigeons = new ArrayList<Pigeon>();
 	
 	@Before
 	public void setUp() {
 		createTestData();
 	 
-	    Mockito.when(flightRepository.findByName(Mockito.any())).thenReturn(testPigeons);
-	    Mockito.when(flightRepository.save(Mockito.any())).thenReturn(testPigeons.get(0));
-	    Mockito.when(flightRepository.existsById(testPigeons.get(0).getId())).thenReturn(true);
-	    Mockito.when(flightRepository.findById(Mockito.any())).thenReturn( Optional.of(testPigeons.get(0)) );
-	    Mockito.doNothing().when(flightRepository).deleteById(Mockito.anyLong());
-	    String[] sortCols = {"name"};
-		Sort sort = new Sort(Direction.DESC, sortCols);
-	    Mockito.when(flightRepository.findAll(sort)).thenReturn(testPigeons);
+	    Mockito.when(flightRepository.findByName(Mockito.any()))
+				.thenReturn(storedPigeons);
+	    Mockito.when(flightRepository.save(Mockito.any()))
+				.thenReturn(storedPigeons.get(0));
+	    Mockito.when(flightRepository.existsById(storedPigeons.get(0).getId()))
+				.thenReturn(true);
+	    Mockito.when(flightRepository.findById(Mockito.any()))
+				.thenReturn( Optional.of(storedPigeons.get(0)) );
+	    Mockito.doNothing().when(flightRepository)
+				.deleteById(Mockito.anyLong());
+	    Mockito.when(flightRepository.findAll(new Sort(Direction.DESC, new String[]{"name"})))
+				.thenReturn(storedPigeons);
 	}
 
 	private void createTestData() {
-		Pigeon newPigeon = new Pigeon();
-	    newPigeon.setId(1L);
-	    newPigeon.setName("test");
-	    testPigeons.add(newPigeon);
+	    storedPigeons.add(new Pigeon(1L, "test", null));
 	}
 
+	@Rule
+	public ExpectedException exceptionRule = ExpectedException.none();
+
 	@Test
-	public void add() {
-		assertThat( arrivalsService.add(testPigeons.get(0)) )
-		.isEqualToComparingFieldByField( testPigeons.get(0) );
+	public void shouldAdd() {
+		Pigeon newPigeon = new Pigeon("test", null);
+
+		assertThat( arrivalsService.add(newPigeon) )
+				.satisfies( result -> {
+					assertThat(result.getId()).isPositive();
+					assertThat(result.getName()).isEqualTo(storedPigeons.get(0).getName());
+				});
 	}
 	
 	@Test 
-	public void update() throws Exception {
-		testPigeons.get(0).setName("updated test name");
-		arrivalsService.update(testPigeons.get(0));
+	public void shouldUpdate_whenExists() {
+		storedPigeons.get(0).setName("updated test name");
+		arrivalsService.update(storedPigeons.get(0));
 		
-		assertThat( arrivalsService.get(testPigeons.get(0).getId()).get() )
-		.isEqualToComparingFieldByField( testPigeons.get(0) );
+		assertThat( arrivalsService.get(storedPigeons.get(0).getId()).get() )
+		.isEqualToComparingFieldByField( storedPigeons.get(0) );
+	}
+
+	@Test
+	public void shouldThrowException_whenUpdateNotExisting() {
+		Pigeon changedPigeon = new Pigeon(9L, "test 2", null);
+
+		Mockito.when(flightRepository.existsById(storedPigeons.get(0).getId()))
+				.thenReturn(false);
+
+		exceptionRule.expect(IllegalArgumentException.class);
+		exceptionRule.expectMessage("Expected id does not exist.");
+		arrivalsService.update(changedPigeon);
 	}
 	
 	@Test
-	public void remove() {
+	public void shouldRemove() {
 		arrivalsService.remove(1L);
 	}
 	
 	@Test
-	public void get() {
-		assertThat( arrivalsService.get( testPigeons.get(0).getId()).get() )
-		.isEqualToComparingFieldByField( testPigeons.get(0) );
+	public void shouldGet() {
+		assertThat( arrivalsService.get( storedPigeons.get(0).getId()).get() )
+		.isEqualToComparingFieldByField( storedPigeons.get(0) );
 	}
 	
 	@Test
-	public void getAll() {
-		assertThat( arrivalsService.getAll().size() ).isEqualTo( testPigeons.size() );
+	public void shouldGetAll() {
+		assertThat( arrivalsService.getAll().size() )
+				.isEqualTo( storedPigeons.size() );
 	}
 	
 	@Test
-	public void findByName() {
-		assertThat( arrivalsService.findByName(testPigeons.get(0).getName()).get(0) )
-		.isEqualToComparingFieldByField( testPigeons.get(0) );
+	public void shouldFindByName() {
+		assertThat( arrivalsService.findByName(storedPigeons.get(0).getName()).get(0) )
+		.isEqualToComparingFieldByField( storedPigeons.get(0) );
 	}
 	
 }
