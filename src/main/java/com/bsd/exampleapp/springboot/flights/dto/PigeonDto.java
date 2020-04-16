@@ -1,10 +1,17 @@
 package com.bsd.exampleapp.springboot.flights.dto;
 
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
+
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+@NoArgsConstructor
+@Accessors(chain = true)
+@Data
 public class PigeonDto {
 
     private Long id;
@@ -16,28 +23,4 @@ public class PigeonDto {
     @NotNull
     @Min(value = 1)
     private Long ownerId;
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public Long getOwnerId() {
-        return ownerId;
-    }
-
-    public void setOwnerId(Long ownerId) {
-        this.ownerId = ownerId;
-    }
 }

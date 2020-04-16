@@ -23,11 +23,10 @@ public class ArrivalsServiceImpl implements ArrivalsService {
 	
 	@Override
 	public void update(Pigeon arrivedPigeon) {
-		if( arrivedPigeons.existsById(arrivedPigeon.getId()) ) {
-			arrivedPigeons.save(arrivedPigeon);
-			return;
+		if( ! arrivedPigeons.existsById(arrivedPigeon.getId()) ) {
+			throw new IllegalArgumentException("Expected id does not exist.");
 		}
-		throw new IllegalArgumentException("Expected id does not exist.");
+		arrivedPigeons.save(arrivedPigeon);
 	}
 
 	@Override
@@ -42,8 +41,7 @@ public class ArrivalsServiceImpl implements ArrivalsService {
 
 	@Override
 	public List<Pigeon> getAll() {
-		Sort sort = new Sort(Direction.DESC, new String[]{"name"});
-		return arrivedPigeons.findAll(sort);
+		return arrivedPigeons.findAll(Sort.by(Direction.DESC, "name"));
 	}
 
 	@Override

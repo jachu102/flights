@@ -22,11 +22,10 @@ public class ApplicationStartupRunner implements CommandLineRunner {
         storeInitData();
     }
 
-    //TODO run for dev profile only
     private void storeInitData() {
-        Owner admin = ownerRepository.save(new Owner(1L, "admin"));
-        flightRepository.save( new Pigeon("pigeon 2", admin));
-        flightRepository.save( new Pigeon("pigeon 1", admin));
-        flightRepository.save( new Pigeon("pigeon 3", admin));
+        Owner admin = ownerRepository.save(Owner.builder().id(1L).name("admin").build());
+        flightRepository.save(Pigeon.builder().name("pigeon 2").owner(admin).build());
+        flightRepository.save(Pigeon.builder().name("pigeon 1").owner(admin).build());
+        flightRepository.save(Pigeon.builder().name("pigeon 3").owner(admin).build());
     }
 }

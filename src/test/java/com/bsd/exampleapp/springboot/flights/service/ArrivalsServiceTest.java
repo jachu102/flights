@@ -59,12 +59,12 @@ public class ArrivalsServiceTest {
 				.thenReturn( Optional.of(storedPigeons.get(0)) );
 	    Mockito.doNothing().when(flightRepository)
 				.deleteById(Mockito.anyLong());
-	    Mockito.when(flightRepository.findAll(new Sort(Direction.DESC, new String[]{"name"})))
+	    Mockito.when(flightRepository.findAll(Sort.by(Direction.DESC, "name")))
 				.thenReturn(storedPigeons);
 	}
 
 	private void createTestData() {
-	    storedPigeons.add(new Pigeon(1L, "test", null));
+	    storedPigeons.add(Pigeon.builder().id(1L).name("test").build());
 	}
 
 	@Rule
@@ -72,7 +72,7 @@ public class ArrivalsServiceTest {
 
 	@Test
 	public void shouldAdd() {
-		Pigeon newPigeon = new Pigeon("test", null);
+		Pigeon newPigeon = Pigeon.builder().name("test").build();
 
 		assertThat( arrivalsService.add(newPigeon) )
 				.satisfies( result -> {
@@ -92,7 +92,7 @@ public class ArrivalsServiceTest {
 
 	@Test
 	public void shouldThrowException_whenUpdateNotExisting() {
-		Pigeon changedPigeon = new Pigeon(9L, "test 2", null);
+		Pigeon changedPigeon = Pigeon.builder().id(9L).name("test 2").build();
 
 		Mockito.when(flightRepository.existsById(storedPigeons.get(0).getId()))
 				.thenReturn(false);
