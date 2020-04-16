@@ -59,7 +59,7 @@ public class ArrivalsServiceTest {
 				.thenReturn( Optional.of(storedPigeons.get(0)) );
 	    Mockito.doNothing().when(flightRepository)
 				.deleteById(Mockito.anyLong());
-	    Mockito.when(flightRepository.findAll(new Sort(Direction.DESC, new String[]{"name"})))
+	    Mockito.when(flightRepository.findAll(Sort.by(Direction.DESC, "name")))
 				.thenReturn(storedPigeons);
 	}
 

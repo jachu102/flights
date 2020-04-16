@@ -42,8 +42,7 @@ public class ArrivalsServiceImpl implements ArrivalsService {
 
 	@Override
 	public List<Pigeon> getAll() {
-		Sort sort = new Sort(Direction.DESC, new String[]{"name"});
-		return arrivedPigeons.findAll(sort);
+		return arrivedPigeons.findAll(Sort.by(Direction.DESC, "name"));
 	}
 
 	@Override
