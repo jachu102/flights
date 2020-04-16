@@ -23,11 +23,10 @@ public class ArrivalsServiceImpl implements ArrivalsService {
 	
 	@Override
 	public void update(Pigeon arrivedPigeon) {
-		if( arrivedPigeons.existsById(arrivedPigeon.getId()) ) {
-			arrivedPigeons.save(arrivedPigeon);
-			return;
+		if( ! arrivedPigeons.existsById(arrivedPigeon.getId()) ) {
+			throw new IllegalArgumentException("Expected id does not exist.");
 		}
-		throw new IllegalArgumentException("Expected id does not exist.");
+		arrivedPigeons.save(arrivedPigeon);
 	}
 
 	@Override

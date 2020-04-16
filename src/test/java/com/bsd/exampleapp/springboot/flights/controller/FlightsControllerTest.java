@@ -6,8 +6,7 @@ import com.bsd.exampleapp.springboot.flights.model.Pigeon;
 import com.bsd.exampleapp.springboot.flights.repository.FlightRepository;
 import com.bsd.exampleapp.springboot.flights.repository.OwnerRepository;
 import com.bsd.exampleapp.springboot.flights.service.ArrivalsService;
-import com.bsd.exampleapp.springboot.flights.service.PigeonConverter;
-import com.fasterxml.jackson.core.JsonProcessingException;
+import com.bsd.exampleapp.springboot.flights.converter.PigeonConverter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import org.junit.Before;
@@ -53,18 +52,16 @@ public class FlightsControllerTest {
     private ObjectWriter ow;
 
     @Before
-    public void setUp() throws JsonProcessingException {
-        owner = new Owner(1L, "admin");
+    public void setUp() {
+        owner = Owner.builder().id(1L).name("admin").build();
         ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
     }
 
     @Test
     public void shouldAddNewArrivedPigeon() throws Exception {
-        PigeonDto dto = new PigeonDto();
-        dto.setName("test 2");
-        dto.setOwnerId(1L);
+        PigeonDto dto = new PigeonDto().setName("test 2").setOwnerId(1L);
 
-        Pigeon savedPigeon = new Pigeon(2L, "test 2", owner);
+        Pigeon savedPigeon = Pigeon.builder().id(2L).name("test 2").owner(owner).build();
 
         Mockito.when(arrivalsService.add(Mockito.any())).thenReturn(savedPigeon);
 
@@ -79,9 +76,7 @@ public class FlightsControllerTest {
 
     @Test
     public void shouldNotAddNewArrivedPigeon_whenEmptyFieldValue() throws Exception {
-        PigeonDto dto = new PigeonDto();
-        dto.setName("   ");
-        dto.setOwnerId(1L);
+        PigeonDto dto = new PigeonDto().setName("   ").setOwnerId(1L);
 
         mvc.perform(post("/flight/add")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -93,9 +88,7 @@ public class FlightsControllerTest {
 
     @Test
     public void shouldNotAddNewArrivedPigeon_whenNullFieldValue() throws Exception {
-        PigeonDto dto = new PigeonDto();
-        dto.setName(null);
-        dto.setOwnerId(1L);
+        PigeonDto dto = new PigeonDto().setName(null).setOwnerId(1L);
 
         mvc.perform(post("/flight/add")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -125,7 +118,7 @@ public class FlightsControllerTest {
 
     @Test
     public void shouldGetAllArrivedPigeons() throws Exception {
-        Pigeon pigeon = new Pigeon(5L, "test 5", null);
+        Pigeon pigeon = Pigeon.builder().id(5L).name("test 5").build();
 
         Mockito.when(arrivalsService.getAll()).thenReturn(Arrays.asList(pigeon));
         mvc.perform(MockMvcRequestBuilders.get("/flight/getAll"))
@@ -137,7 +130,7 @@ public class FlightsControllerTest {
 
     @Test
     public void shouldGetOneArrivedPigeon() throws Exception {
-        Pigeon pigeon = new Pigeon(4L, "test 4", null);
+        Pigeon pigeon = Pigeon.builder().id(4L).name("test 4").build();
 
         Mockito.when(arrivalsService.get(pigeon.getId())).thenReturn(Optional.of(pigeon));
         mvc.perform(MockMvcRequestBuilders.get("/flight/get/" + pigeon.getId()))
@@ -148,7 +141,7 @@ public class FlightsControllerTest {
 
     @Test
     public void shouldFindArrivedPigeonByName() throws Exception {
-        Pigeon pigeon = new Pigeon(3L, "test 3", null);
+        Pigeon pigeon = Pigeon.builder().id(3L).name("test 3").build();
 
         Mockito.when(arrivalsService.findByName(pigeon.getName())).thenReturn(Arrays.asList(pigeon));
         mvc.perform(MockMvcRequestBuilders.get("/flight/findByName").param("name", pigeon.getName()))
@@ -177,9 +170,7 @@ public class FlightsControllerTest {
 
     @Test
     public void shouldUpdate() throws Exception {
-        PigeonDto dto = new PigeonDto();
-        dto.setName("test 2 updated");
-        dto.setOwnerId(1L);
+        PigeonDto dto = new PigeonDto().setName("test 2 updated").setOwnerId(1L);
 
         mvc.perform(put("/flight/update/2")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -189,10 +180,7 @@ public class FlightsControllerTest {
 
     @Test
     public void shouldNotUpdate_WhenDifferentId() throws Exception {
-        PigeonDto dto = new PigeonDto();
-        dto.setId(999L);
-        dto.setName("test 2 updated");
-        dto.setOwnerId(1L);
+        PigeonDto dto = new PigeonDto().setId(999L).setName("test 2 updated").setOwnerId(1L);
 
         mvc.perform(put("/flight/update/2")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -204,8 +192,7 @@ public class FlightsControllerTest {
 
     @Test
     public void shouldNotUpdate_whenNotFieldFilled() throws Exception {
-        PigeonDto dto = new PigeonDto();
-        dto.setName("test");
+        PigeonDto dto = new PigeonDto().setName("test");
 
         mvc.perform(put("/flight/update/2")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -217,10 +204,7 @@ public class FlightsControllerTest {
 
     @Test
     public void shouldNotUpdate_whenNotExist() throws Exception {
-        PigeonDto dto = new PigeonDto();
-        dto.setId(999L);
-        dto.setName("test 2 updated");
-        dto.setOwnerId(1L);
+        PigeonDto dto = new PigeonDto().setId(999L).setName("test 2 updated").setOwnerId(1L);
         Mockito.doThrow(new IllegalArgumentException("Expected id does not exist.")).when(arrivalsService).update(Mockito.any());
 
         mvc.perform(put("/flight/update/" + dto.getId())

@@ -1,6 +1,6 @@
 package com.bsd.exampleapp.springboot.flights.controller;
 
-import com.bsd.exampleapp.springboot.flights.service.PigeonConverter;
+import com.bsd.exampleapp.springboot.flights.converter.PigeonConverter;
 import com.bsd.exampleapp.springboot.flights.dto.PigeonDto;
 import com.bsd.exampleapp.springboot.flights.model.Pigeon;
 import com.bsd.exampleapp.springboot.flights.service.ArrivalsService;
