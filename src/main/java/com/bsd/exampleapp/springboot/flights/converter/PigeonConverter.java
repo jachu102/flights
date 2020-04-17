@@ -18,7 +18,8 @@ public class PigeonConverter implements Converter<PigeonDto, Pigeon> {
         return Pigeon.builder()
                 .id(pigeonDto.getId())
                 .name(pigeonDto.getName())
-                .owner(ownerRepository.findById(pigeonDto.getOwnerId()).orElseThrow(() -> new IllegalArgumentException("OwnerId does not exists.")))
+                .owner(ownerRepository.findById(pigeonDto.getOwnerId())
+                        .orElseThrow(() -> new IllegalArgumentException("OwnerId does not exists.")))
                 .build();
     }
 }
