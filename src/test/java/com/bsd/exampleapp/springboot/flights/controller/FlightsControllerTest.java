@@ -1,12 +1,12 @@
 package com.bsd.exampleapp.springboot.flights.controller;
 
+import com.bsd.exampleapp.springboot.flights.converter.PigeonConverter;
 import com.bsd.exampleapp.springboot.flights.dto.PigeonDto;
 import com.bsd.exampleapp.springboot.flights.model.Owner;
 import com.bsd.exampleapp.springboot.flights.model.Pigeon;
 import com.bsd.exampleapp.springboot.flights.repository.FlightRepository;
 import com.bsd.exampleapp.springboot.flights.repository.OwnerRepository;
 import com.bsd.exampleapp.springboot.flights.service.ArrivalsService;
-import com.bsd.exampleapp.springboot.flights.converter.PigeonConverter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import org.junit.Before;
@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -30,6 +31,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @RunWith(SpringRunner.class)
 @WebMvcTest(value = FlightsController.class)
+@ActiveProfiles("test")
 public class FlightsControllerTest {
 
     @Autowired
