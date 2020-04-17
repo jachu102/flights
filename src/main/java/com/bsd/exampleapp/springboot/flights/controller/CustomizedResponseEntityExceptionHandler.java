@@ -1,6 +1,7 @@
 package com.bsd.exampleapp.springboot.flights.controller;
 
 import com.bsd.exampleapp.springboot.flights.other.ErrorDetails;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -15,6 +16,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 import java.util.Date;
 
 @ControllerAdvice
+@Slf4j
 public class CustomizedResponseEntityExceptionHandler extends ResponseEntityExceptionHandler {
 
     @Override
@@ -23,6 +25,7 @@ public class CustomizedResponseEntityExceptionHandler extends ResponseEntityExce
         String detailMessage = "Field '" + ex.getBindingResult().getFieldError().getField() + "' " +
                 ex.getBindingResult().getFieldError().getDefaultMessage() + ".";
         ErrorDetails errorDetails = new ErrorDetails(new Date(), "Not allowed value of input data field.", detailMessage);
+        log(errorDetails);
         return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
     }
 
@@ -30,6 +33,7 @@ public class CustomizedResponseEntityExceptionHandler extends ResponseEntityExce
     protected ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
         String detailMessage = ex.getRootCause()==null ? ex.getClass().getSimpleName() : ex.getRootCause().getMessage();
         ErrorDetails errorDetails = new ErrorDetails(new Date(), "Not relevant input data.", detailMessage);
+        log(errorDetails);
         return handleExceptionInternal(ex, errorDetails, headers, HttpStatus.BAD_REQUEST, request);
     }
 
@@ -37,13 +41,19 @@ public class CustomizedResponseEntityExceptionHandler extends ResponseEntityExce
     public final ResponseEntity<Object> handleBadRequest(RuntimeException ex, final WebRequest request) {
         String detailMessage = ex.getMessage()==null ? ex.getClass().getSimpleName() : ex.getMessage();
         ErrorDetails errorDetails = new ErrorDetails(new Date(), "No integrity of input data.", detailMessage);
+        log(errorDetails);
         return handleExceptionInternal(ex, errorDetails, new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
     }
 
     @ExceptionHandler(value = {IllegalArgumentException.class})
     public final ResponseEntity<Object> handleNotExistId(RuntimeException ex, final WebRequest request) {
-        String detailMessage = ex.getMessage()==null ? ex.getClass().getSimpleName() : ex.getMessage();
+        String detailMessage = ex.getMessage() == null ? ex.getClass().getSimpleName() : ex.getMessage();
         ErrorDetails errorDetails = new ErrorDetails(new Date(), "Data not exists.", detailMessage);
+        log(errorDetails);
         return handleExceptionInternal(ex, errorDetails, new HttpHeaders(), HttpStatus.NOT_FOUND, request);
+    }
+
+    private void log(ErrorDetails errorDetails) {
+        log.error("{} {}", errorDetails.getMessage(), errorDetails.getDetails());
     }
 }

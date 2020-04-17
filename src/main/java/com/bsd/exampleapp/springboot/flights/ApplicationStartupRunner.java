@@ -6,9 +6,11 @@ import com.bsd.exampleapp.springboot.flights.repository.FlightRepository;
 import com.bsd.exampleapp.springboot.flights.repository.OwnerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 @Component
+@Profile("dev")
 public class ApplicationStartupRunner implements CommandLineRunner {
 
     @Autowired
