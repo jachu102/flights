@@ -1,6 +1,5 @@
 package com.bsd.exampleapp.springboot.flights.controller;
 
-import com.bsd.exampleapp.springboot.flights.converter.PigeonConverter;
 import com.bsd.exampleapp.springboot.flights.dto.PigeonDto;
 import com.bsd.exampleapp.springboot.flights.model.Owner;
 import com.bsd.exampleapp.springboot.flights.model.Pigeon;
@@ -16,6 +15,7 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.core.convert.ConversionService;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -40,8 +40,8 @@ public class FlightsControllerTest {
     @MockBean
     ArrivalsService arrivalsService;
 
-    @MockBean
-    PigeonConverter pigeonConverter;
+    @Autowired
+    ConversionService conversionService;
 
     @MockBean
     OwnerRepository ownerRepository;
@@ -62,10 +62,10 @@ public class FlightsControllerTest {
     @Test
     public void shouldAddNewArrivedPigeon() throws Exception {
         PigeonDto dto = new PigeonDto().setName("test 2").setOwnerId(1L);
-
         Pigeon savedPigeon = Pigeon.builder().id(2L).name("test 2").owner(owner).build();
 
         Mockito.when(arrivalsService.add(Mockito.any())).thenReturn(savedPigeon);
+        Mockito.when(ownerRepository.findById(1L)).thenReturn(Optional.of(owner));
 
         mvc.perform(post("/flight/add")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -120,7 +120,7 @@ public class FlightsControllerTest {
 
     @Test
     public void shouldGetAllArrivedPigeons() throws Exception {
-        Pigeon pigeon = Pigeon.builder().id(5L).name("test 5").build();
+        Pigeon pigeon = Pigeon.builder().id(5L).name("test 5").owner(owner).build();
 
         Mockito.when(arrivalsService.getAll()).thenReturn(Arrays.asList(pigeon));
         mvc.perform(MockMvcRequestBuilders.get("/flight/getAll"))
@@ -132,7 +132,7 @@ public class FlightsControllerTest {
 
     @Test
     public void shouldGetOneArrivedPigeon() throws Exception {
-        Pigeon pigeon = Pigeon.builder().id(4L).name("test 4").build();
+        Pigeon pigeon = Pigeon.builder().id(4L).name("test 4").owner(owner).build();
 
         Mockito.when(arrivalsService.get(pigeon.getId())).thenReturn(Optional.of(pigeon));
         mvc.perform(MockMvcRequestBuilders.get("/flight/get/" + pigeon.getId()))
@@ -143,7 +143,7 @@ public class FlightsControllerTest {
 
     @Test
     public void shouldFindArrivedPigeonByName() throws Exception {
-        Pigeon pigeon = Pigeon.builder().id(3L).name("test 3").build();
+        Pigeon pigeon = Pigeon.builder().id(3L).name("test 3").owner(owner).build();
 
         Mockito.when(arrivalsService.findByName(pigeon.getName())).thenReturn(Arrays.asList(pigeon));
         mvc.perform(MockMvcRequestBuilders.get("/flight/findByName").param("name", pigeon.getName()))
@@ -173,6 +173,8 @@ public class FlightsControllerTest {
     @Test
     public void shouldUpdate() throws Exception {
         PigeonDto dto = new PigeonDto().setName("test 2 updated").setOwnerId(1L);
+
+        Mockito.when(ownerRepository.findById(1L)).thenReturn(Optional.of(owner));
 
         mvc.perform(put("/flight/update/2")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -207,6 +209,8 @@ public class FlightsControllerTest {
     @Test
     public void shouldNotUpdate_whenNotExist() throws Exception {
         PigeonDto dto = new PigeonDto().setId(999L).setName("test 2 updated").setOwnerId(1L);
+
+        Mockito.when(ownerRepository.findById(1L)).thenReturn(Optional.of(owner));
         Mockito.doThrow(new IllegalArgumentException("Expected id does not exist.")).when(arrivalsService).update(Mockito.any());
 
         mvc.perform(put("/flight/update/" + dto.getId())

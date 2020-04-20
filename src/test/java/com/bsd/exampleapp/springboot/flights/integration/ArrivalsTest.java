@@ -9,6 +9,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.core.convert.ConversionService;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -25,6 +27,9 @@ public class ArrivalsTest {
     //TODO move repo to common service
     @Autowired
     private OwnerRepository ownerRepository;
+
+    @MockBean
+    private ConversionService conversionService;
 
     @BeforeEach
     void setUp() {
