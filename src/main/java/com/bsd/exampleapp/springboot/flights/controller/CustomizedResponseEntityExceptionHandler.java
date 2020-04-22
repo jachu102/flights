@@ -3,6 +3,7 @@ package com.bsd.exampleapp.springboot.flights.controller;
 import com.bsd.exampleapp.springboot.flights.other.ErrorDetails;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -45,7 +46,7 @@ public class CustomizedResponseEntityExceptionHandler extends ResponseEntityExce
         return handleExceptionInternal(ex, errorDetails, new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
     }
 
-    @ExceptionHandler(value = {IllegalArgumentException.class})
+    @ExceptionHandler(value = {EmptyResultDataAccessException.class, IllegalArgumentException.class})
     public final ResponseEntity<Object> handleNotExistId(RuntimeException ex, final WebRequest request) {
         String detailMessage = ex.getMessage() == null ? ex.getClass().getSimpleName() : ex.getMessage();
         ErrorDetails errorDetails = new ErrorDetails(new Date(), "Data not exists.", detailMessage);

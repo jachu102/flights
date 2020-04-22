@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.core.convert.ConversionService;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -163,11 +164,11 @@ public class FlightsControllerTest {
     @Test
     public void shouldNotRemove_whenNotExist() throws Exception {
         Long id = 1L;
-        Mockito.doThrow(new IllegalArgumentException("Expected id does not exist.")).when(arrivalsService).remove(id);
+        Mockito.doThrow(new EmptyResultDataAccessException(1)).when(arrivalsService).remove(id);
         mvc.perform(delete("/flight/remove/" + id))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").value("Data not exists."))
-                .andExpect(jsonPath("$.details").value("Expected id does not exist."));
+                .andExpect(jsonPath("$.details").value("Incorrect result size: expected 1, actual 0"));
     }
 
     @Test
@@ -211,13 +212,13 @@ public class FlightsControllerTest {
         PigeonDto dto = new PigeonDto().setId(999L).setName("test 2 updated").setOwnerId(1L);
 
         Mockito.when(ownerRepository.findById(1L)).thenReturn(Optional.of(owner));
-        Mockito.doThrow(new IllegalArgumentException("Expected id does not exist.")).when(arrivalsService).update(Mockito.any());
+        Mockito.doThrow(new IllegalArgumentException("No class Pigeon entity with id 1 exists!")).when(arrivalsService).update(Mockito.any());
 
         mvc.perform(put("/flight/update/" + dto.getId())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(ow.writeValueAsString(dto)))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").value("Data not exists."))
-                .andExpect(jsonPath("$.details").value("Expected id does not exist."));
+                .andExpect(jsonPath("$.details").value("No class Pigeon entity with id 1 exists!"));
     }
 }

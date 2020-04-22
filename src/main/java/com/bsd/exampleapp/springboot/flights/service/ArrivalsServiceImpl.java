@@ -24,7 +24,8 @@ public class ArrivalsServiceImpl implements ArrivalsService {
 	@Override
 	public void update(Pigeon arrivedPigeon) {
 		if (!flightRepository.existsById(arrivedPigeon.getId())) {
-			throw new IllegalArgumentException("Expected id does not exist.");
+			String message = String.format("No class %s entity with id %s exists!", Pigeon.class.getName(), arrivedPigeon.getId());
+			throw new IllegalArgumentException(message);
 		}
 		flightRepository.save(arrivedPigeon);
 	}

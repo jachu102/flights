@@ -99,8 +99,10 @@ public class ArrivalsServiceTest {
 		Mockito.when(flightRepository.existsById(storedPigeons.get(0).getId()))
 				.thenReturn(false);
 
+		final String expectedMesssage = "No class com.bsd.exampleapp.springboot.flights.model.Pigeon entity with id "
+				+ changedPigeon.getId() + " exists!";
 		exceptionRule.expect(IllegalArgumentException.class);
-		exceptionRule.expectMessage("Expected id does not exist.");
+		exceptionRule.expectMessage(expectedMesssage);
 		arrivalsService.update(changedPigeon);
 	}
 	
