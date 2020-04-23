@@ -3,23 +3,19 @@ package com.bsd.exampleapp.springboot.flights.controller;
 import com.bsd.exampleapp.springboot.flights.dto.PigeonDto;
 import com.bsd.exampleapp.springboot.flights.model.Owner;
 import com.bsd.exampleapp.springboot.flights.model.Pigeon;
-import com.bsd.exampleapp.springboot.flights.repository.FlightRepository;
 import com.bsd.exampleapp.springboot.flights.repository.OwnerRepository;
 import com.bsd.exampleapp.springboot.flights.service.ArrivalsService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.core.convert.ConversionService;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
@@ -30,7 +26,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@RunWith(SpringRunner.class)
 @WebMvcTest(value = FlightsController.class)
 @ActiveProfiles("test")
 public class FlightsControllerTest {
@@ -41,20 +36,14 @@ public class FlightsControllerTest {
     @MockBean
     ArrivalsService arrivalsService;
 
-    @Autowired
-    ConversionService conversionService;
-
     @MockBean
     OwnerRepository ownerRepository;
-
-    @MockBean
-    FlightRepository flightRepository;
 
     private Owner owner;
 
     private ObjectWriter ow;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         owner = Owner.builder().id(1L).name("admin").build();
         ow = new ObjectMapper().writer().withDefaultPrettyPrinter();

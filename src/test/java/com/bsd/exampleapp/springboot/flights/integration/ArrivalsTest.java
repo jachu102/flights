@@ -6,7 +6,6 @@ import com.bsd.exampleapp.springboot.flights.repository.OwnerRepository;
 import com.bsd.exampleapp.springboot.flights.service.ArrivalsService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -15,7 +14,6 @@ import org.springframework.core.convert.ConversionService;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
-@TestInstance(value = TestInstance.Lifecycle.PER_METHOD)
 public class ArrivalsTest {
 
     public static final long TEST_OWNER_ID = 1L;
