@@ -1,24 +1,21 @@
 package com.bsd.exampleapp.springboot.flights.controller;
 
-import com.bsd.exampleapp.springboot.flights.converter.PigeonConverter;
 import com.bsd.exampleapp.springboot.flights.dto.PigeonDto;
 import com.bsd.exampleapp.springboot.flights.model.Owner;
 import com.bsd.exampleapp.springboot.flights.model.Pigeon;
-import com.bsd.exampleapp.springboot.flights.repository.FlightRepository;
 import com.bsd.exampleapp.springboot.flights.repository.OwnerRepository;
 import com.bsd.exampleapp.springboot.flights.service.ArrivalsService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
@@ -29,7 +26,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@RunWith(SpringRunner.class)
 @WebMvcTest(value = FlightsController.class)
 @ActiveProfiles("test")
 public class FlightsControllerTest {
@@ -41,19 +37,13 @@ public class FlightsControllerTest {
     ArrivalsService arrivalsService;
 
     @MockBean
-    PigeonConverter pigeonConverter;
-
-    @MockBean
     OwnerRepository ownerRepository;
-
-    @MockBean
-    FlightRepository flightRepository;
 
     private Owner owner;
 
     private ObjectWriter ow;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         owner = Owner.builder().id(1L).name("admin").build();
         ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
@@ -62,10 +52,10 @@ public class FlightsControllerTest {
     @Test
     public void shouldAddNewArrivedPigeon() throws Exception {
         PigeonDto dto = new PigeonDto().setName("test 2").setOwnerId(1L);
-
         Pigeon savedPigeon = Pigeon.builder().id(2L).name("test 2").owner(owner).build();
 
         Mockito.when(arrivalsService.add(Mockito.any())).thenReturn(savedPigeon);
+        Mockito.when(ownerRepository.findById(1L)).thenReturn(Optional.of(owner));
 
         mvc.perform(post("/flight/add")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -120,7 +110,7 @@ public class FlightsControllerTest {
 
     @Test
     public void shouldGetAllArrivedPigeons() throws Exception {
-        Pigeon pigeon = Pigeon.builder().id(5L).name("test 5").build();
+        Pigeon pigeon = Pigeon.builder().id(5L).name("test 5").owner(owner).build();
 
         Mockito.when(arrivalsService.getAll()).thenReturn(Arrays.asList(pigeon));
         mvc.perform(MockMvcRequestBuilders.get("/flight/getAll"))
@@ -132,7 +122,7 @@ public class FlightsControllerTest {
 
     @Test
     public void shouldGetOneArrivedPigeon() throws Exception {
-        Pigeon pigeon = Pigeon.builder().id(4L).name("test 4").build();
+        Pigeon pigeon = Pigeon.builder().id(4L).name("test 4").owner(owner).build();
 
         Mockito.when(arrivalsService.get(pigeon.getId())).thenReturn(Optional.of(pigeon));
         mvc.perform(MockMvcRequestBuilders.get("/flight/get/" + pigeon.getId()))
@@ -143,7 +133,7 @@ public class FlightsControllerTest {
 
     @Test
     public void shouldFindArrivedPigeonByName() throws Exception {
-        Pigeon pigeon = Pigeon.builder().id(3L).name("test 3").build();
+        Pigeon pigeon = Pigeon.builder().id(3L).name("test 3").owner(owner).build();
 
         Mockito.when(arrivalsService.findByName(pigeon.getName())).thenReturn(Arrays.asList(pigeon));
         mvc.perform(MockMvcRequestBuilders.get("/flight/findByName").param("name", pigeon.getName()))
@@ -163,16 +153,18 @@ public class FlightsControllerTest {
     @Test
     public void shouldNotRemove_whenNotExist() throws Exception {
         Long id = 1L;
-        Mockito.doThrow(new IllegalArgumentException("Expected id does not exist.")).when(arrivalsService).remove(id);
+        Mockito.doThrow(new EmptyResultDataAccessException(1)).when(arrivalsService).remove(id);
         mvc.perform(delete("/flight/remove/" + id))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").value("Data not exists."))
-                .andExpect(jsonPath("$.details").value("Expected id does not exist."));
+                .andExpect(jsonPath("$.details").value("Incorrect result size: expected 1, actual 0"));
     }
 
     @Test
     public void shouldUpdate() throws Exception {
         PigeonDto dto = new PigeonDto().setName("test 2 updated").setOwnerId(1L);
+
+        Mockito.when(ownerRepository.findById(1L)).thenReturn(Optional.of(owner));
 
         mvc.perform(put("/flight/update/2")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -207,13 +199,15 @@ public class FlightsControllerTest {
     @Test
     public void shouldNotUpdate_whenNotExist() throws Exception {
         PigeonDto dto = new PigeonDto().setId(999L).setName("test 2 updated").setOwnerId(1L);
-        Mockito.doThrow(new IllegalArgumentException("Expected id does not exist.")).when(arrivalsService).update(Mockito.any());
+
+        Mockito.when(ownerRepository.findById(1L)).thenReturn(Optional.of(owner));
+        Mockito.doThrow(new IllegalArgumentException("No class Pigeon entity with id 1 exists!")).when(arrivalsService).update(Mockito.any());
 
         mvc.perform(put("/flight/update/" + dto.getId())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(ow.writeValueAsString(dto)))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").value("Data not exists."))
-                .andExpect(jsonPath("$.details").value("Expected id does not exist."));
+                .andExpect(jsonPath("$.details").value("No class Pigeon entity with id 1 exists!"));
     }
 }

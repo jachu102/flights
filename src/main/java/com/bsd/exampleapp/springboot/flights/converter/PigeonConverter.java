@@ -5,9 +5,7 @@ import com.bsd.exampleapp.springboot.flights.model.Pigeon;
 import com.bsd.exampleapp.springboot.flights.repository.OwnerRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.core.convert.converter.Converter;
-import org.springframework.stereotype.Component;
 
-@Component
 @AllArgsConstructor
 public class PigeonConverter implements Converter<PigeonDto, Pigeon> {
 
@@ -18,7 +16,8 @@ public class PigeonConverter implements Converter<PigeonDto, Pigeon> {
         return Pigeon.builder()
                 .id(pigeonDto.getId())
                 .name(pigeonDto.getName())
-                .owner(ownerRepository.findById(pigeonDto.getOwnerId()).orElseThrow(() -> new IllegalArgumentException("OwnerId does not exists.")))
+                .owner(ownerRepository.findById(pigeonDto.getOwnerId())
+                        .orElseThrow(() -> new IllegalArgumentException("OwnerId does not exists.")))
                 .build();
     }
 }

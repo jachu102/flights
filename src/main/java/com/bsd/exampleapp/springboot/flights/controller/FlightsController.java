@@ -1,17 +1,17 @@
 package com.bsd.exampleapp.springboot.flights.controller;
 
-import com.bsd.exampleapp.springboot.flights.converter.PigeonConverter;
 import com.bsd.exampleapp.springboot.flights.dto.PigeonDto;
 import com.bsd.exampleapp.springboot.flights.model.Pigeon;
 import com.bsd.exampleapp.springboot.flights.service.ArrivalsService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.convert.ConversionService;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping(path="flight")
@@ -21,31 +21,36 @@ public class FlightsController {
 	ArrivalsService arrivalsService;
 
 	@Autowired
-	PigeonConverter pigeonConverter;
+	ConversionService conversionService;
 
 	@PostMapping(value = "add")
 	@ResponseStatus(HttpStatus.CREATED)
-	public Pigeon add(@Validated @RequestBody PigeonDto pigeonDto) {
-		Pigeon arrivedPigeon = pigeonConverter.convert(pigeonDto);
-		return arrivalsService.add(arrivedPigeon);
+	public PigeonDto add(@Validated @RequestBody PigeonDto pigeonDto) {
+		Pigeon pigeon = conversionService.convert(pigeonDto, Pigeon.class);
+		pigeon = arrivalsService.add(pigeon);
+		return conversionService.convert(pigeon, PigeonDto.class);
 	}
-	
+
 	@GetMapping(value = "getAll")
 	@ResponseStatus(HttpStatus.OK)
-	public List<Pigeon> getAll() {
-		return arrivalsService.getAll();
+	public List<PigeonDto> getAll() {
+		return arrivalsService.getAll().stream()
+				.map(pigeon -> conversionService.convert(pigeon, PigeonDto.class))
+				.collect(Collectors.toList());
 	}
-	
+
 	@GetMapping(value = "get/{id}")
 	@ResponseStatus(HttpStatus.OK)
-	public Optional<Pigeon> get(@PathVariable(name="id") Long id) {
-		return arrivalsService.get(id);
+	public PigeonDto get(@PathVariable(name = "id") Long id) {
+		return conversionService.convert(arrivalsService.get(id).get(), PigeonDto.class);
 	}
-	
+
 	@GetMapping(value = "findByName")
 	@ResponseStatus(HttpStatus.OK)
-	public List<Pigeon> findByName(@RequestParam(name="name") String name) {
-		return arrivalsService.findByName(name);
+	public List<PigeonDto> findByName(@RequestParam(name = "name") String name) {
+		return arrivalsService.findByName(name).stream()
+				.map(pigeon -> conversionService.convert(pigeon, PigeonDto.class))
+				.collect(Collectors.toList());
 	}
 	
 	@DeleteMapping(value = "remove/{id}")
@@ -58,7 +63,7 @@ public class FlightsController {
 	@ResponseStatus(HttpStatus.OK)
 	public Long update(@PathVariable(name="id") Long id, @Validated @RequestBody PigeonDto updatedData) {
 		ensureIdIntegrity(id, updatedData);
-		Pigeon convertedPigeon = pigeonConverter.convert(updatedData);
+		Pigeon convertedPigeon = conversionService.convert(updatedData, Pigeon.class);
 		arrivalsService.update(convertedPigeon);
 		return id;
 	}

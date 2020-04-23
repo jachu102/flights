@@ -10,42 +10,43 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 
-@Service
+@Service("arrivalsService")
 public class ArrivalsServiceImpl implements ArrivalsService {
-	
+
 	@Autowired
-	FlightRepository arrivedPigeons;
+	FlightRepository flightRepository;
 
 	@Override
 	public Pigeon add(Pigeon arrivedPigeon) {
-		return arrivedPigeons.save(arrivedPigeon);
+		return flightRepository.save(arrivedPigeon);
 	}
 	
 	@Override
 	public void update(Pigeon arrivedPigeon) {
-		if( ! arrivedPigeons.existsById(arrivedPigeon.getId()) ) {
-			throw new IllegalArgumentException("Expected id does not exist.");
+		if (!flightRepository.existsById(arrivedPigeon.getId())) {
+			String message = String.format("No class %s entity with id %s exists!", Pigeon.class.getName(), arrivedPigeon.getId());
+			throw new IllegalArgumentException(message);
 		}
-		arrivedPigeons.save(arrivedPigeon);
+		flightRepository.save(arrivedPigeon);
 	}
 
 	@Override
 	public void remove(Long pigeonId) {
-		arrivedPigeons.deleteById(pigeonId);
+		flightRepository.deleteById(pigeonId);
 	}
 
 	@Override
 	public Optional<Pigeon> get(Long id) {
-		return arrivedPigeons.findById(id);
+		return flightRepository.findById(id);
 	}
 
 	@Override
 	public List<Pigeon> getAll() {
-		return arrivedPigeons.findAll(Sort.by(Direction.DESC, "name"));
+		return flightRepository.findAll(Sort.by(Direction.DESC, "name"));
 	}
 
 	@Override
 	public List<Pigeon> findByName(String name) {
-		return arrivedPigeons.findByName(name);
+		return flightRepository.findByName(name);
 	}
 }
