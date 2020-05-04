@@ -1,5 +1,6 @@
 package com.bsd.exampleapp.springboot.flights.integration;
 
+import com.bsd.exampleapp.springboot.flights.config.WebSecurityConfig;
 import com.bsd.exampleapp.springboot.flights.model.Owner;
 import com.bsd.exampleapp.springboot.flights.model.Pigeon;
 import com.bsd.exampleapp.springboot.flights.repository.OwnerRepository;
@@ -10,10 +11,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.core.convert.ConversionService;
+import org.springframework.test.context.ActiveProfiles;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
+@ActiveProfiles(value = "test")
 public class ArrivalsTest {
 
     public static final long TEST_OWNER_ID = 1L;
@@ -27,6 +30,10 @@ public class ArrivalsTest {
 
     @MockBean
     private ConversionService conversionService;
+
+    //TODO refactor to skip bean init
+    @MockBean
+    private WebSecurityConfig webSecurityConfig;
 
     @BeforeEach
     void setUp() {
